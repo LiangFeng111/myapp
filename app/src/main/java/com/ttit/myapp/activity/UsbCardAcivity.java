@@ -1,5 +1,6 @@
 package com.ttit.myapp.activity;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -79,9 +80,9 @@ public class UsbCardAcivity extends BaseActivity {
 
         // 更新显示结果
         if (isConnected) {
-            Toast.makeText(this, "ID读卡器已连接", Toast.LENGTH_SHORT).show();
+            showToast("ID读卡器已连接");
         } else {
-            Toast.makeText(this, "ID读卡器未连接", Toast.LENGTH_SHORT).show();
+            showToast("ID读卡器未连接");
         }
     }
 }

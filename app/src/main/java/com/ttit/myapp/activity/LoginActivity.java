@@ -1,6 +1,8 @@
 package com.ttit.myapp.activity;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Button;
@@ -14,6 +16,10 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.ttit.myapp.R;
+import com.ttit.myapp.api.Api;
+import com.ttit.myapp.api.ApiConfig;
+import com.ttit.myapp.api.TtitCallback;
+import com.ttit.myapp.util.AppConfig;
 
 import org.json.JSONObject;
 
@@ -56,50 +62,50 @@ public class LoginActivity extends BaseActivity {
     private void login(String account, String pwd){
         if (TextUtils.isEmpty(account) || TextUtils.isEmpty(pwd)){
             showToast("账号或密码不能为空");
+            return;
         }
-        navigateTo(UsbCardAcivity.class);
+        post(account, pwd);
+
     }
 
     /**
      * 异步post请求
      */
-    private void post() {
-        //第一步创建OKHttpClient
-        OkHttpClient client = new OkHttpClient.Builder()
-                .build();
-        //第二步创建RequestBody（Form表达）
-//        RequestBody body = new FormBody.Builder()
-//                .add("mobile", "demoData")
-//                .add("password", "demoData")
-//                .build();
-        Map m = new HashMap();
-        m.put("mobile", "demoData");
-        m.put("password", "demoData");
-        JSONObject jsonObject = new JSONObject(m);
-        String jsonStr = jsonObject.toString();
-        RequestBody requestBodyJson =
-                RequestBody.create(MediaType.parse("application/json;charset=utf-8")
-                        , jsonStr);
-        //第三步创建Rquest
-        Request request = new Request.Builder()
-                .url("http://192.168.31.32:8080/renren-fast/app/login")
-                .addHeader("contentType", "application/json;charset=UTF-8")
-                .post(requestBodyJson)
-                .build();
-        //第四步创建call回调对象
-        final Call call = client.newCall(request);
-        //第五步发起请求
-        call.enqueue(new Callback() {
+    private void post(String account, String pwd) {
+        HashMap<Object, Object> m = new HashMap<>();
+        m.put("mobile", account);
+        m.put("password", pwd);
+
+        Api.config(ApiConfig.LOGIN, m).postRequest(new TtitCallback() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                Log.i("onFailure", e.getMessage());
+            public void onSuccess(String result) {
+                Log.e("1111111111", result );
+                //把result转换成json对象
+                JSONObject object = null;
+                showToastAsync("123");
+                try {
+                    object = new JSONObject(result);
+                    String code = object.getString("code");
+                    String msg = object.getString("msg");
+                    if ("200".equals(code)){
+                        showToast("登录成功");
+                        //暂缓1秒
+                        mSleep(() ->navigateTo(UsbCardAcivity.class),1000);
+
+                    }else {
+                        showToastAsync(msg);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String result = response.body().string();
+            public void onFailure(IOException e) {
 
             }
         });
     }
+
+
 }

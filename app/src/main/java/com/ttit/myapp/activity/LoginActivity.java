@@ -1,5 +1,6 @@
 package com.ttit.myapp.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -15,10 +16,12 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.google.gson.Gson;
 import com.ttit.myapp.R;
 import com.ttit.myapp.api.Api;
 import com.ttit.myapp.api.ApiConfig;
 import com.ttit.myapp.api.TtitCallback;
+import com.ttit.myapp.entity.LoginResponse;
 import com.ttit.myapp.util.AppConfig;
 
 import org.json.JSONObject;
@@ -80,23 +83,19 @@ public class LoginActivity extends BaseActivity {
             @Override
             public void onSuccess(String result) {
                 Log.e("1111111111", result );
-                //把result转换成json对象
-                JSONObject object = null;
-                showToastAsync("123");
-                try {
-                    object = new JSONObject(result);
-                    String code = object.getString("code");
-                    String msg = object.getString("msg");
-                    if ("200".equals(code)){
-                        showToast("登录成功");
-                        //暂缓1秒
-                        mSleep(() ->navigateTo(UsbCardAcivity.class),1000);
 
-                    }else {
-                        showToastAsync(msg);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
+                Gson gson = new Gson();
+                LoginResponse loginResponse = gson.fromJson(result, LoginResponse.class);
+                if (loginResponse.getCode() ==200){
+                    String token = loginResponse.getData();
+                    //保存token
+                    saveStringToSp("token", token);
+
+                    showToastAsync("登录成功");
+                    //暂缓1秒
+                    mSleep(() ->navigateTo(HomeActivity.class),1000);
+                }else {
+                    showToastAsync(loginResponse.getMsg());
                 }
             }
 

@@ -2,6 +2,7 @@ package com.ttit.myapp.activity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -21,9 +22,12 @@ public class BaseActivity extends AppCompatActivity {
         Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
     }
     public void showToastAsync(String msg){
-        Looper.prepare();
-        Toast.makeText(context,msg,Toast.LENGTH_SHORT).show();
-        Looper.loop();
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void navigateTo(Class<?> cls){
@@ -34,5 +38,12 @@ public class BaseActivity extends AppCompatActivity {
     public void mSleep(Runnable action, long delayMillis) {
         Handler handler = new Handler(Looper.getMainLooper());
         handler.postDelayed(action, delayMillis);
+    }
+
+    protected  void saveStringToSp(String key,String value){
+        SharedPreferences sp = getSharedPreferences("sp_ttit", MODE_PRIVATE);
+        SharedPreferences.Editor edit = sp.edit();
+        edit.putString(key, value);
+        edit.apply();
     }
 }

@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
-            android:id="@+id/login"
+            android:id="@+id/bt_login"
             android:layout_alignParentLeft="true"
             android:layout_width="100dp"
             android:layout_height="48dp"
@@ -24,7 +24,7 @@
             android:background="@drawable/shape_login_btn"
             android:text="@string/login"/>
         <Button
-            android:id="@+id/register"
+            android:id="@+id/bt_register"
             android:layout_alignParentRight="true"
             android:layout_width="100dp"
             android:layout_height="48dp"
